@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import viewsets,status
 from .models import Ingredient, Hamburger
 from .serializers import IngredientSerializer, HamburgerSerializer, HamburgerPartialSerializer
 from rest_framework.decorators import action, api_view
@@ -12,20 +13,31 @@ class IngredientViewSet(viewsets.ModelViewSet):
     http_method_names = ['get','delete', 'put']
 
     def get_queryset(self):
-        return Ingredient.objects.filter(ingredients__in=[self.kwargs['hamburguesa_pk']])
+        if Hamburger.objects.filter(id=self.kwargs['hamburguesa_pk']).exists():
+            hamburger = Hamburger.objects.get(pk=self.kwargs['hamburguesa_pk'])
+            query = Ingredient.objects.filter(ingredients__in=[self.kwargs['hamburguesa_pk']])
+            return query
+        return Ingredient.objects.none()
 
     def destroy(self, request, *args, **kwargs):
-        hamburger = Hamburger.objects.get(pk=self.kwargs['hamburguesa_pk'])
-        ingredient = self.get_object()
-        hamburger.ingredients.remove(ingredient)
-        return Response(data='Delete success')
-    
-    # def partial_update(self, request, *args, **kwargs):
-    #     print('hola')
-    #     # hamburger = Hamburger.objects.get(pk=self.kwargs['hamburguesa_pk'])
-    #     # ingredient = self.get_object()
-    #     # hamburger.ingredients.add(ingredient)
-    #     # return Response(data='New ingredient added to burger')
+        if Hamburger.objects.filter(id=self.kwargs['hamburguesa_pk']).exists():
+            hamburger = Hamburger.objects.get(pk=self.kwargs['hamburguesa_pk'])
+            ingredient = self.get_object()
+            hamburger.ingredients.remove(ingredient)
+            return Response(status=200, data='Ingrediente retirado')
+        return Response(status=400, data='Id de hamburguesa inválido')
+
+
+    def update(self, request, *args, **kwargs):
+        if Hamburger.objects.filter(id=self.kwargs['hamburguesa_pk']).exists():
+            hamburger = Hamburger.objects.get(pk=self.kwargs['hamburguesa_pk'])
+            if Ingredient.objects.filter(pk=self.kwargs['pk']).exists():
+                ingredient = Ingredient.objects.get(pk=self.kwargs['pk'])
+                hamburger.ingredients.add(ingredient)
+                return Response(status=201,data='Ingrediente agregado')
+            return Response(status=404, data='Ingrediente inexistente')
+        return Response(status=400, data='Id de hamburguesa inválido')
+
 
 
 class IngredientView(viewsets.ModelViewSet):
@@ -36,9 +48,9 @@ class IngredientView(viewsets.ModelViewSet):
         ingredient = self.get_object()
         for x in Hamburger.objects.all():
             if ingredient in x.ingredients.all():
-                return Response(data='Delete Denied: Ingredient is part of a existing hamburger')
+                return Response(status=409,data='Ingrediente no se puede borrar, se encuentra presente en una hamburguesa')
         ingredient.delete()
-        return Response(data='Delete success')
+        return Response(status=200,data='Ingrediente eliminado')
 
 
 class HamburgerView(viewsets.ModelViewSet):
@@ -49,4 +61,7 @@ class HamburgerView(viewsets.ModelViewSet):
         if self.action == "partial_update":
              return HamburgerPartialSerializer
         return HamburgerSerializer
+
+
+
 
