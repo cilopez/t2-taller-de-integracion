@@ -3,7 +3,7 @@ from . import views
 from rest_framework_nested import routers
 
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 router.register('ingrediente', views.IngredientView)
 router.register('hamburguesa', views.HamburgerView)
 ingredients_router = routers.NestedSimpleRouter(router, 'hamburguesa', lookup='hamburguesa')
