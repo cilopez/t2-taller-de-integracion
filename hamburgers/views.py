@@ -41,6 +41,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 
 class IngredientView(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'delete']
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
 
