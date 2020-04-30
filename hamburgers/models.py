@@ -2,20 +2,20 @@ from django.db import models
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.CharField(max_length=512)
+    nombre = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=512)
 
     def __str__(self):
-        return self.name
+        return self.nombre
 
 
 class Hamburger(models.Model):
-    name = models.CharField(max_length=50)
-    price = models.PositiveIntegerField()
-    description = models.CharField(max_length=512)
-    image = models.CharField(max_length=512)
-    ingredients = models.ManyToManyField(Ingredient,related_name='ingredients', null=True, blank=True)
+    nombre = models.CharField(max_length=50)
+    precio = models.PositiveIntegerField()
+    descripcion = models.CharField(max_length=512)
+    imagen = models.CharField(max_length=512)
+    ingredientes = models.ManyToManyField(Ingredient,related_name='ingredients', null=True, blank=True)
 
     
     def __str__(self):
-        return self.name
+        return self.nombre

@@ -4,16 +4,16 @@ from .models import Ingredient, Hamburger
 class IngredientSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('id', 'url', 'name', 'description')
+        fields = ('id', 'url', 'nombre', 'descripcion')
 
 class HamburgerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Hamburger
-        fields = ('id', 'url', 'name', 'price', 'description', 'image','ingredients')
+        fields = ('id', 'url', 'nombre', 'precio', 'descripcion', 'imagen','ingredientes')
 
 class HamburgerPartialSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Hamburger
-        fields = ('id', 'url', 'name', 'price', 'description', 'image')
+        fields = ('id', 'url', 'nombre', 'precio', 'descripcion', 'imagen')
 
 
